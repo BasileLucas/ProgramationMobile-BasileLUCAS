@@ -10,6 +10,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  
+
+  flutter_svg: ^2.2.3
 
 dev_dependencies:
   flutter_test:
@@ -23,6 +26,11 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  assets:
+    - assets/apple_logo.svg
+    - assets/facebook_logo.svg
+    - assets/google_logo.svg
 
   # To add assets to your application, add an assets section, like this:
   # assets:
