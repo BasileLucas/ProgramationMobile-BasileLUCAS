@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'My Application',
       theme: ThemeData(
-        appBarTheme: const AppBarThemeData(centerTitle: false),
+        appBarTheme: const AppBarThemeData(centerTitle: true),
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
       ),
       home: const LoginPage(),

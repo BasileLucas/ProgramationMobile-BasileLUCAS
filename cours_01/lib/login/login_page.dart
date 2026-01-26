@@ -1,89 +1,176 @@
+import 'package:cours_01/res/colors.dart';
 import 'package:flutter/material.dart';
-import '../res/colors.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
-class LoginPage extends StatelessWidget {
+
+
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+
+
+class _LoginPageState extends State<LoginPage> {
+  String _email = '';
+
+  @override
   Widget build(BuildContext context) {
-    return  Scaffold(
+    return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Login or sign up',
+        title: Text(
+          'Log in or sign up',
           style: TextStyle(
-            color: AppColors.textPrimary,
-            fontSize: 30,
+            color: Theme.of(context).primaryColor,
+            fontSize: 16.0,
             fontWeight: FontWeight.bold,
-        )
-      ),  
-    ),
-  
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: const [
-            EmailField(),
-            SizedBox(height: 16),
-            ContinueButton(),
-            SizedBox(height: 32),
-            OrSeparator(),
-            SizedBox(height: 32),
-            ContinueWithButton(),
-          ],
+          ),
+        ),
+      ),
+      body: Center(
+        child: FractionallySizedBox(
+          widthFactor: 0.8,
+          child: Column(
+            children: [
+              EmailAddress(
+                valueChanged: (String value) {
+                  setState(() {
+                    _email = value;
+                  });
+                },
+              ),
+              ContinueButton(
+                onPressed: _email.isNotEmpty ? () {} : null,
+              ),
+              const OrDivider(),
+              ContinueWithButton(
+                label: 'Continue with Apple',
+                asset: 'assets/apple_logo.svg',
+                onPressed: () {},
+              ),
+              ContinueWithButton(
+                label: 'Continue with Google',
+                asset: 'assets/google_logo.svg',
+                onPressed: () {},
+              ),
+              ContinueWithButton(
+                label: 'Continue with Facebook',
+                asset: 'assets/facebook_logo.svg',
+                onPressed: () {},
+              ),
+            ],
+          ),
         ),
       ),
     );
-    ;
   }
 }
 
-class EmailField extends StatelessWidget {
-  const EmailField({super.key});
+
+class EmailAddress extends StatelessWidget {
+  const EmailAddress({
+    super.key,
+    required this.valueChanged,
+  });
+
+  final ValueChanged<String> valueChanged;
 
   @override
   Widget build(BuildContext context) {
     return TextField(
+      autofocus: false,
+      onChanged: valueChanged,
+      style: TextStyle(color: AppColors.textPrimary),
       decoration: InputDecoration(
-        hintText: 'Email Address',
         prefixIcon: const Icon(Icons.email_outlined),
-        filled: true,
-        fillColor: Colors.white,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
+        hintText: 'Email Address',
+        hintStyle: TextStyle(color: AppColors.textSecondary),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.0),
+          borderSide: BorderSide(
+            color: AppColors.inputFieldActiveBackground,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.0),
+          borderSide: BorderSide(
+            color: AppColors.inputFieldInactiveBackground,
+          ),
         ),
       ),
     );
   }
 }
 
+
 class ContinueButton extends StatelessWidget {
-  const ContinueButton({super.key});
+  const ContinueButton({Key? key, this.onPressed}) : super(key: key);
+
+  final VoidCallback? onPressed;
 
   @override
   Widget build(BuildContext context) {
-    return const Text('Continuer');
+    return FilledButton(
+      style: FilledButton.styleFrom(
+        foregroundColor: AppColors.buttonPrimaryText,
+        backgroundColor: AppColors.buttonPrimaryBackground,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+      ),
+      onPressed: onPressed,
+      child: Text('Continue', style: TextStyle(fontWeight: FontWeight.bold)),
+    );
   }
 }
 
-class OrSeparator extends StatelessWidget {
-  const OrSeparator({super.key});
+class OrDivider extends StatelessWidget {
+  const OrDivider({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Text('Or');
+    return Row(
+      children: [
+        Expanded(child: Divider()),
+        Text('Or', style: TextStyle(color: AppColors.textSecondary)),
+        Expanded(child: Divider()),
+      ],
+    );
   }
 }
 
 class ContinueWithButton extends StatelessWidget {
-  const ContinueWithButton({super.key});
+  const ContinueWithButton({
+    required this.asset,
+    required this.label,
+    required this.onPressed,
+    super.key,
+  });
+
+  final String label;
+  final String asset;
+  final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
-    return const Text('Continuer avec Google');
+    return FilledButton(
+      style: FilledButton.styleFrom(
+        foregroundColor: AppColors.buttonSecondaryText,
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.0),
+          side: BorderSide(color: AppColors.buttonSecondaryBackground),
+        ),
+      ),
+      onPressed: onPressed,
+      child: Row(
+        children: [
+          SvgPicture.asset(asset),
+          Expanded(child: Text(label, textAlign: TextAlign.center)),
+        ],
+      ),
+    );
   }
 }
-
-
-
