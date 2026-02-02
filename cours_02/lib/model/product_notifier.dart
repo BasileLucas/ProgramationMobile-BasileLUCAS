@@ -15,7 +15,7 @@ class ProductNotifier extends ChangeNotifier {
     notifyListeners();
 
     final dio = Dio();
-    const barcode = '3017620422003';
+    const barcode = '5000159407236';
     
     try {
       final response = await dio.get(
