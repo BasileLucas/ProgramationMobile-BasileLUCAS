@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:formation_flutter/model/product_notifier.dart';
 import 'package:formation_flutter/l10n/app_localizations.dart';
 import 'package:formation_flutter/model/product.dart';
 import 'package:formation_flutter/res/app_colors.dart';
@@ -8,58 +10,65 @@ import 'package:formation_flutter/widgets/product_inherited.dart';
 
 class ProductPage extends StatelessWidget {
   const ProductPage({super.key});
-
   static const double IMAGE_HEIGHT = 300.0;
 
   @override
   Widget build(BuildContext context) {
-    // Récupération du produit depuis l'InheritedWidget
-    final productData = ProductInherited.of(context)?.product;
+    return Consumer<ProductNotifier>(
+      builder: (context, notifier, _) {
+        final product = notifier.product;
 
-    return Scaffold(
-      body: SizedBox.expand(
-        child: Stack(
+        if (product == null) {
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+
+        return Scaffold(
+          body: SizedBox.expand(
+            child: Stack(
+              children: [
+                _buildHeaderImage(context, product.picture),
+                _buildProductDetails(context, product),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  
+  Widget _buildHeaderImage(BuildContext context, String? url) {
+    return PositionedDirectional(
+      top: 0, start: 0, end: 0, height: IMAGE_HEIGHT,
+      child: Image.network(
+        url ?? '',
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => Container(color: Colors.grey[200]),
+      ),
+    );
+  }
+
+  Widget _buildProductDetails(BuildContext context, dynamic product) {
+    return PositionedDirectional(
+      top: IMAGE_HEIGHT - 16.0,
+      start: 0, end: 0, bottom: 0,
+      child: Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            PositionedDirectional(
-              top: 0.0,
-              start: 0.0,
-              end: 0.0,
-              height: IMAGE_HEIGHT,
-              child: Image.network(
-                productData?.picture ?? '', // Utilisation de l'image du produit
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Container(color: Colors.grey[300]), // Cas où l'image échoue
-                cacheHeight: (IMAGE_HEIGHT * MediaQuery.devicePixelRatioOf(context)).toInt(),
-              ),
-            ),
-            PositionedDirectional(
-              top: IMAGE_HEIGHT - 16.0,
-              start: 0.0,
-              end: 0.0,
-              bottom: 0.0,
-              child: Container(
-                decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
-                  color: Colors.white,
-                ),
-                padding: const EdgeInsetsDirectional.symmetric(horizontal: 20.0, vertical: 30.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      productData?.name ?? 'Inconnu', // Nom dynamique
-                      style: context.theme.title1,
-                    ),
-                    Text(
-                      productData?.brands?.join(', ') ?? 'Marque inconnue', // Marque dynamique
-                      style: context.theme.title2,
-                    ),
-                    // On passe les données au widget Scores
-                    if (productData != null) Scores(product: productData),
-                  ],
-                ),
-              ),
-            ),
+            Text(product.name ?? '', style: Theme.of(context).textTheme.headlineSmall),
+            Text(product.brands?.join(", ") ?? '', style: const TextStyle(color: Colors.grey)),
+            const SizedBox(height: 10),
+            Scores(product: product),
           ],
         ),
       ),
@@ -68,7 +77,7 @@ class ProductPage extends StatelessWidget {
 }
 
 class Scores extends StatelessWidget {
-  final Product product; // Ajout du paramètre pour recevoir les données
+  final Product product; 
   const Scores({super.key, required this.product});
 
   @override
