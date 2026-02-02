@@ -1,4 +1,5 @@
 // ignore_for_file: constant_identifier_names
+
 class Product {
   final String barcode;
   final String? name;
@@ -12,8 +13,6 @@ class Product {
   final ProductNovaScore? novaScore;
   final ProductGreenScore? greenScore;
   final List<String>? ingredients;
-
-  // Eg: "Sucre, <span class=\"allergen\">gluten de blé</span>"
   final String? ingredientsWithAllergens;
   final List<String>? traces;
   final List<String>? allergens;
@@ -49,6 +48,55 @@ class Product {
     this.isVegan,
     this.isVegetarian,
   });
+
+  factory Product.fromJson(Map<String, dynamic> json) {
+    return Product(
+      barcode: json['code'] ?? '',
+      name: json['product_name'],
+      altName: json['generic_name'],
+      picture: json['image_front_url'],
+      quantity: json['quantity'],
+      brands: json['brands']?.toString().split(','),
+      nutriScore: _parseNutriScore(json['nutriscore_grade']),
+      novaScore: _parseNovaScore(json['nova_group']),
+      greenScore: _parseGreenScore(json['ecoscore_grade']),
+      ingredientsFromPalmOil: json['ingredients_from_palm_oil_n'] != null && 
+                              json['ingredients_from_palm_oil_n'] > 0,
+    );
+  }
+
+  static ProductNutriScore _parseNutriScore(String? grade) {
+    return switch (grade?.toLowerCase()) {
+      'a' => ProductNutriScore.A,
+      'b' => ProductNutriScore.B,
+      'c' => ProductNutriScore.C,
+      'd' => ProductNutriScore.D,
+      'e' => ProductNutriScore.E,
+      _ => ProductNutriScore.unknown,
+    };
+  }
+
+  static ProductNovaScore _parseNovaScore(dynamic group) {
+    return switch (group.toString()) {
+      '1' => ProductNovaScore.group1,
+      '2' => ProductNovaScore.group2,
+      '3' => ProductNovaScore.group3,
+      '4' => ProductNovaScore.group4,
+      _ => ProductNovaScore.unknown,
+    };
+  }
+
+  static ProductGreenScore _parseGreenScore(String? grade) {
+    return switch (grade?.toLowerCase()) {
+      'a' => ProductGreenScore.A,
+      'b' => ProductGreenScore.B,
+      'c' => ProductGreenScore.C,
+      'd' => ProductGreenScore.D,
+      'e' => ProductGreenScore.E,
+      'f' => ProductGreenScore.F,
+      _ => ProductGreenScore.unknown,
+    };
+  }
 }
 
 class NutritionFacts {
@@ -156,118 +204,13 @@ enum ProductAnalysis {
 }
 
 Product generateProduct() => Product(
-  barcode: '1234567890',
+  barcode: '3017620422003',
   name: 'Nutella',
-  altName: 'Product Alt Name',
-  picture:
-      'https://images.openfoodfacts.org/images/products/301/762/042/5035/front_fr.533.400.jpg',
-  quantity: '200g',
-  brands: ['Ferrero', 'Ferrero'],
-  manufacturingCountries: ['France', 'Italie'],
+  altName: 'Pâte à tartiner',
+  picture: 'https://images.openfoodfacts.org/images/products/301/762/042/2003/front_fr.533.400.jpg',
+  quantity: '400g',
+  brands: ['Ferrero'],
   nutriScore: ProductNutriScore.E,
   novaScore: ProductNovaScore.group4,
   greenScore: ProductGreenScore.D,
-  ingredients: [
-    'Sucre',
-    'sirop de glucose',
-    '_lait_ écrémé',
-    'crème légère (_lait_)',
-    'eau',
-    'beurre de cacao',
-    'matière grasse de noix de coco',
-    '_lait_ écrémé concentré sucré',
-    'pâte de cacao',
-    'farine de _blé_',
-    'matière grasse de palme',
-    '_lait_ écrémé en poudre',
-    '_lactose_',
-    'matière grasse du _lait_',
-    'huile de palmiste',
-    'petit-_lait_ en poudre',
-    'cacao maigre',
-    'beurre (_lait_)',
-    'émulsifiants (lécithine de _soja_, E471, tristéarate de sorbitane)',
-    '_lait_ entier en poudre',
-    'stabilisants (E407, E410, E412)',
-    'arômes naturels (_lait_)',
-    'sel',
-    'colorant naturel (caramel ordinaire)',
-    'cacao en poudre',
-    'poudre à lever (E503)',
-    'extrait naturel de vanille',
-  ],
-  ingredientsWithAllergens:
-      'Sucre, sirop de glucose, <span class="allergen">lait</span> écrémé, crème légère (<span class="allergen">lait</span>), eau, beurre de cacao, matière grasse de noix de coco, <span class="allergen">lait</span> écrémé concentré sucré, pâte de cacao, farine de <span class="allergen">blé</span>, matière grasse de palme, <span class="allergen">lait</span> écrémé en poudre, <span class="allergen">lactose</span>, matière grasse du <span class="allergen">lait</span>, huile de palmiste, petit-<span class="allergen">lait</span> en poudre, cacao maigre, <span class="allergen">beurre</span> (<span class="allergen">lait</span>), émulsifiants (lécithine de <span class="allergen">soja</span>, E471, tristéarate de sorbitane), <span class="allergen">lait</span> entier en poudre, stabilisants (E407, E410, E412), arômes naturels (<span class="allergen">lait</span>), sel, colorant naturel (caramel ordinaire), cacao en poudre, poudre à lever (E503), extrait naturel de vanille. (Peut contenir<span class="allergen">: cacahuète</span>, <span class="allergen">noisette</span>, <span class="allergen">amande</span>).',
-  traces: ['cacahuète', 'noisette', 'amande'],
-  allergens: ['lait', 'soja', 'beurre'],
-  additives: {'e322i': 'Description', 'e471': 'Description'},
-  nutriScoreLevels: ProductNutriScoreLevels(
-    energy: ProductNutriScoreLevel(
-      points: 3,
-      maxPoints: 10,
-      unit: 'kJ',
-      value: 1180,
-      type: ProductNutriScoreLevelType.negative,
-    ),
-    saturatedFat: ProductNutriScoreLevel(
-      points: 9,
-      maxPoints: 10,
-      unit: 'g',
-      value: 9.05,
-      type: ProductNutriScoreLevelType.negative,
-    ),
-    sugars: ProductNutriScoreLevel(
-      points: 7,
-      maxPoints: 15,
-      unit: 'g',
-      value: 25.5,
-      type: ProductNutriScoreLevelType.negative,
-    ),
-    proteins: ProductNutriScoreLevel(
-      points: 1,
-      maxPoints: 7,
-      unit: 'g',
-      value: 3.5,
-      type: ProductNutriScoreLevelType.positive,
-    ),
-    fiber: ProductNutriScoreLevel(
-      points: 0,
-      maxPoints: 5,
-      unit: 'g',
-      value: 0,
-      type: ProductNutriScoreLevelType.unknown,
-    ),
-    salt: ProductNutriScoreLevel(
-      points: 1,
-      maxPoints: 20,
-      unit: 'g',
-      value: 0,
-      type: ProductNutriScoreLevelType.positive,
-    ),
-    fruitsVegetablesLegumes: ProductNutriScoreLevel(
-      points: 0,
-      maxPoints: 5,
-      unit: '%',
-      value: 0,
-      type: ProductNutriScoreLevelType.positive,
-    ),
-  ),
-  nutrientLevels: NutrientLevels(
-    salt: 'Low',
-    saturatedFat: 'Low',
-    sugars: 'Low',
-    fat: 'Low',
-  ),
-  nutritionFacts: NutritionFacts(
-    servingSize: '100g',
-    calories: Nutriment(unit: 'kcal', perServing: 100, per100g: 100),
-    fat: Nutriment(unit: 'g', perServing: 10, per100g: 10),
-    saturatedFat: Nutriment(unit: 'g', perServing: 5, per100g: 5),
-    carbohydrate: Nutriment(unit: 'g', perServing: 20, per100g: 20),
-    sugar: Nutriment(unit: 'g', perServing: 10, per100g: 10),
-    fiber: Nutriment(unit: 'g', perServing: 5, per100g: 5),
-    proteins: Nutriment(unit: 'g', perServing: 10, per100g: 10),
-    sodium: Nutriment(unit: 'mg', perServing: 100, per100g: 100),
-    salt: Nutriment(unit: 'g', perServing: 0.1, per100g: 0.1),
-  ),
 );

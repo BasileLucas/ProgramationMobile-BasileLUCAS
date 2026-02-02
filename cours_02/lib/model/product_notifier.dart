@@ -1,22 +1,36 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:formation_flutter/model/product.dart';
 
 class ProductNotifier extends ChangeNotifier {
-  Product? _currentProduct;
-
-  Product? get product => _currentProduct;
+  Product? _product;
+  Product? get product => _product;
 
   ProductNotifier() {
-    refreshProduct();
+    fetchProduct();
   }
 
-  Future<void> refreshProduct() async {
-    _currentProduct = null;
+  Future<void> fetchProduct() async {
+    _product = null;
     notifyListeners();
 
-    await Future.delayed(const Duration(seconds: 2));
+    final dio = Dio();
+    const barcode = '3017620422003';
+    
+    try {
+      final response = await dio.get(
+        'https://world.openfoodfacts.org/api/v2/product/$barcode',
+      );
 
-    _currentProduct = generateProduct();
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = response.data;
+        if (data.containsKey('product')) {
+          _product = Product.fromJson(data['product']);
+        }
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+    }
 
     notifyListeners();
   }
