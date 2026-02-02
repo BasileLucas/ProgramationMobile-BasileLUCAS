@@ -57,15 +57,15 @@ class Product {
       picture: json['image_front_url'],
       quantity: json['quantity'],
       brands: json['brands']?.toString().split(','),
-      nutriScore: _parseNutriScore(json['nutriscore_grade']),
-      novaScore: _parseNovaScore(json['nova_group']),
-      greenScore: _parseGreenScore(json['ecoscore_grade']),
+      nutriScore: parseNutriScore(json['nutriscore_grade']),
+      novaScore: parseNovaScore(json['nova_group']),
+      greenScore: parseGreenScore(json['ecoscore_grade']),
       ingredientsFromPalmOil: json['ingredients_from_palm_oil_n'] != null && 
                               json['ingredients_from_palm_oil_n'] > 0,
     );
   }
 
-  static ProductNutriScore _parseNutriScore(String? grade) {
+  static ProductNutriScore parseNutriScore(String? grade) {
     return switch (grade?.toLowerCase()) {
       'a' => ProductNutriScore.A,
       'b' => ProductNutriScore.B,
@@ -76,7 +76,7 @@ class Product {
     };
   }
 
-  static ProductNovaScore _parseNovaScore(dynamic group) {
+  static ProductNovaScore parseNovaScore(dynamic group) {
     return switch (group.toString()) {
       '1' => ProductNovaScore.group1,
       '2' => ProductNovaScore.group2,
@@ -86,7 +86,7 @@ class Product {
     };
   }
 
-  static ProductGreenScore _parseGreenScore(String? grade) {
+  static ProductGreenScore parseGreenScore(String? grade) {
     return switch (grade?.toLowerCase()) {
       'a' => ProductGreenScore.A,
       'b' => ProductGreenScore.B,
@@ -214,3 +214,23 @@ Product generateProduct() => Product(
   novaScore: ProductNovaScore.group4,
   greenScore: ProductGreenScore.D,
 );
+
+class ProductResponse {
+  final ProductData? product;
+  final int? status;
+
+  ProductResponse.fromJSON(Map<String, dynamic> json)
+      : product = json['product'] != null ? ProductData.fromJSON(json['product']) : null,
+        status = json['status'];
+}
+
+class ProductData {
+  final String? name;
+  final String? image;
+  final String? grade;
+
+  ProductData.fromJSON(Map<String, dynamic> json)
+      : name = json['product_name'],
+        image = json['image_front_url'],
+        grade = json['nutriscore_grade'];
+}
